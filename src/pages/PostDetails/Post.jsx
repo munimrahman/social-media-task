@@ -1,6 +1,8 @@
-const TextPost = () => {
+import postPhoto from "../../assets/post.jpg";
+
+const Post = () => {
   return (
-    <div className="bg-white mb-6 p-5 rounded-lg">
+    <div className="bg-white my-6 p-5 rounded-lg">
       {/* post header */}
 
       <div className="flex justify-between items-center">
@@ -37,13 +39,11 @@ const TextPost = () => {
       <p className="mt-3 text-gray-700">
         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ad at pariatur
         laboriosam sint alias nihil aperiam earum voluptatibus vero error? Lorem
-        ipsum dolor sit amet, consectetur adipisicing elit. Eaque, accusantium
-        soluta! Dolorum odit earum fugit consectetur suscipit delectus provident
-        veniam doloribus soluta adipisci quaerat ad explicabo id natus tempora
-        tempore et fuga nobis velit obcaecati, eligendi repudiandae? Facilis,
-        laudantium magnam dolor atque sapiente eius dolorum possimus cupiditate
-        rem vitae sed?
+        ipsum dolor sit amet, consectetur.
       </p>
+      <figure className="my-4 flex justify-center">
+        <img src={postPhoto} className="rounded-lg w-full max-h-80" alt="" />
+      </figure>
       {/* post bottom */}
       <div className="flex justify-between mt-3">
         {/* like button */}
@@ -113,4 +113,4 @@ const TextPost = () => {
   );
 };
 
-export default TextPost;
+export default Post;

@@ -32,7 +32,7 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="rounded-lg bg-white dark:bg-black sm:dark:border dark:border-zinc-600 overflow-hidden">
+    <div className="rounded-lg bg-white dark:bg-black sm:dark:border dark:border-zinc-600 overflow-hidden mb-6">
       <div className="px-2 sm:px-4 pt-5 pb-">
         <div className="flex gap-1 items-start">
           <div className="flex-shrink-0">
