@@ -3,8 +3,12 @@ import postPhoto from "../../assets/post.jpg";
 import avatar from "../../assets/avatar.png";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import { useLoveReactMutation } from "../../features/post/postApi";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import apiSlice from "../../features/api/apiSlice";
 
-const Post = ({ post }) => {
+const Post = ({ post, from }) => {
   const {
     _id,
     content,
@@ -14,6 +18,50 @@ const Post = ({ post }) => {
     comments = [],
     author: { name, profilePhoto } = {},
   } = post || {};
+  const [loveReact, { data }] = useLoveReactMutation();
+  const [isLoved, setIsLoved] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleLoveReact = () => {
+    const data = {};
+    setIsLoved(!isLoved);
+    if (!isLoved) {
+      data.loves = 1;
+    } else {
+      data.loves = -1;
+    }
+    loveReact({ data, postId: _id });
+  };
+
+  useEffect(() => {
+    if (from === "home") {
+      if (data) {
+        dispatch(
+          apiSlice.util.updateQueryData(
+            "getThreePosts",
+            undefined,
+            (draftPosts) => {
+              const updatedIndex = draftPosts.posts.findIndex(
+                (post) => post?._id == data?.post?._id
+              );
+              draftPosts.posts[updatedIndex] = data.post;
+            }
+          )
+        );
+      }
+    } else {
+      if (data) {
+        dispatch(
+          apiSlice.util.updateQueryData("getPosts", undefined, (draftPosts) => {
+            const updatedIndex = draftPosts.posts.findIndex(
+              (post) => post?._id == data?.post?._id
+            );
+            draftPosts.posts[updatedIndex] = data.post;
+          })
+        );
+      }
+    }
+  }, [data, dispatch, from]);
 
   return (
     <div className="bg-white mb-6 p-5 rounded-lg">
@@ -80,13 +128,13 @@ const Post = ({ post }) => {
       <div className="flex justify-between mt-3">
         {/* like button */}
         <div className="flex items-center justify-center gap-1">
-          <div>
+          <button onClick={handleLoveReact}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
+              fill={isLoved ? "red" : "none"}
               viewBox="0 0 24 24"
               strokeWidth="1.5"
-              stroke="gray"
+              stroke={isLoved ? "red" : "gray"}
               className="w-5 h-5 hover:cursor-pointer"
             >
               <path
@@ -95,14 +143,18 @@ const Post = ({ post }) => {
                 d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
               />
             </svg>
-          </div>
+          </button>
           <p className="text-sm text-gray-500">
-            {loves} <span className="hidden md:inline">people like this</span>
+            {loves}
+            <span className="hidden md:inline"> people like this</span>
           </p>
         </div>
         {/* comment */}
         <div className="flex items-center justify-center gap-2">
-          <div className="flex items-center justify-center gap-1">
+          <Link
+            to={`/posts/${_id}`}
+            className="flex items-center justify-center gap-1"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -117,15 +169,15 @@ const Post = ({ post }) => {
                 d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"
               />
             </svg>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 hover:underline">
               {comments.length}{" "}
               <span className="hidden md:inline">Comments</span>
             </p>
-          </div>
+          </Link>
           {/* details button */}
           <Link
             to={`/posts/${_id}`}
-            className="flex items-center justify-center"
+            className="flex items-center justify-center gap-1 hover:underline"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

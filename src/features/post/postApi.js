@@ -12,6 +12,22 @@ export const blogsApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    // get top three posts
+    getThreePosts: builder.query({
+      query: (query) => ({
+        url: `/top-three`,
+        params: query,
+      }),
+    }),
+
+    // get top three posts
+    getMyPosts: builder.query({
+      query: (query) => ({
+        url: `/user-posts`,
+        params: query,
+      }),
+    }),
+
     // get single post
     getSinglePost: builder.query({
       query: (id) => `/posts/${id}`,
@@ -55,24 +71,50 @@ export const blogsApi = apiSlice.injectEndpoints({
       },
     }),
 
-    addBlog: builder.mutation({
+    // love react to post
+    loveReact: builder.mutation({
+      query: ({ postId, data }) => ({
+        url: `/posts/${postId}`,
+        method: "PUT",
+        body: data,
+      }),
+
+      async onQueryStarted({ postId }, { queryFulfilled, dispatch }) {
+        try {
+          const { data: res } = await queryFulfilled;
+
+          if (res.post._id) {
+            dispatch(
+              apiSlice.util.updateQueryData(
+                "getSinglePost",
+                postId,
+                (draft) => {
+                  Object.assign(draft, { post: res.post });
+                }
+              )
+            );
+          }
+        } catch (error) {
+          //
+        }
+      },
+    }),
+
+    // add post
+    addPost: builder.mutation({
       query: (data) => ({
-        url: "/blogs",
+        url: "/posts",
         method: "POST",
         body: data,
       }),
-      async onQueryStarted({ id, data }, { queryFulfilled, dispatch }) {
+      async onQueryStarted(args, { queryFulfilled, dispatch }) {
         const res = await queryFulfilled;
 
         if (res.data.data._id) {
           dispatch(
-            apiSlice.util.updateQueryData(
-              "getCustomers",
-              undefined,
-              (draft) => {
-                draft.data.customers.push(res.data.data);
-              }
-            )
+            apiSlice.util.updateQueryData("getPosts", undefined, (draft) => {
+              draft.post.push(res.post);
+            })
           );
         }
       },
@@ -135,4 +177,8 @@ export const {
   useGetPostsQuery,
   useGetSinglePostQuery,
   useCreateCommentMutation,
+  useLoveReactMutation,
+  useAddPostMutation,
+  useGetThreePostsQuery,
+  useGetMyPostsQuery,
 } = blogsApi;

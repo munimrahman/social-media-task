@@ -1,11 +1,20 @@
 import { useState } from "react";
 import Post from "../../components/MediaPost/Post";
-import TextPost from "../../components/MediaPost/TextPost";
 import EditModal from "./EditModal";
+import { useGetPostsQuery } from "../../features/post/postApi";
 
 const About = () => {
   const [modalCheck, setModalCheck] = useState(false);
   const id = 5;
+  const email = "semon@gmail.com";
+
+  const { data: { posts = [] } = {} } = useGetPostsQuery();
+
+  const myPosts = posts.filter((post) => {
+    console.log(post.authorEmail);
+    return post.authorEmail === email;
+  });
+
   return (
     <div className="mt-5 max-w-[1180px] mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-12 px-5 md:pt5 gap-6">
@@ -49,9 +58,9 @@ const About = () => {
           <h1 className="bg-white rounded-lg p-4 text-lg font-bold mb-6">
             My Posts
           </h1>
-          <TextPost />
-          <Post />
-          <Post />
+          {myPosts.map((post) => (
+            <Post post={post} key={post._id} />
+          ))}
         </div>
       </div>
       <EditModal id={id} isChecked={modalCheck} setModalCheck={setModalCheck} />

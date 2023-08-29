@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useAddPostMutation } from "../../features/post/postApi";
+import avatar from "../../assets/avatar.png";
 
 const useAutoSizeTextArea = (textAreaRef, value) => {
   useEffect(() => {
@@ -15,32 +17,78 @@ const useAutoSizeTextArea = (textAreaRef, value) => {
 };
 
 const CreatePost = () => {
+  const authorEmail = "tamim@gmail.com";
   const [textValue, setTextValue] = useState("");
   const [imagePath, setImagePath] = useState(null);
-
-  // const onBlur = () => setFocused(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [addPost, { isLoading }] = useAddPostMutation();
   const textAreaRef = useRef(null);
   useAutoSizeTextArea(textAreaRef.current, textValue);
   const onImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setImagePath(URL.createObjectURL(event.target.files[0]));
+      setImageFile(event.target.files[0]);
     }
   };
 
   const removeImage = () => {
     setImagePath(null);
   };
+  if (loading || isLoading) {
+    console.log(loading, isLoading);
+  } else {
+    console.log(loading, isLoading);
+  }
+  const imageHostKey = "d813c7643bdd7e54cf105fb37f5f3f78";
+  const handlePost = () => {
+    if (imagePath) {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("image", imageFile);
+      const url = `https://api.imgbb.com/1/upload?key=${imageHostKey}`;
+      fetch(url, {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((imgData) => {
+          if (imgData.success) {
+            const postData = {
+              content: textValue,
+              author: "64ed13f5598c4854fe402780",
+              authorEmail,
+              loves: 0,
+              photoUrl: imgData.data.url,
+            };
+            setLoading(false);
+            //   save info to database
+            addPost(postData);
+            setTextValue("");
+          }
+        });
+    } else {
+      const postData = {
+        content: textValue,
+        author: "64ed13f5598c4854fe402780",
+        authorEmail,
+        loves: 0,
+      };
+      //   save info to database
+      addPost(postData);
+    }
+  };
+  let disableButton = true;
+  if (imagePath || textValue) disableButton = false;
 
   return (
     <div className="rounded-lg bg-white dark:bg-black sm:dark:border dark:border-zinc-600 overflow-hidden mb-6">
       <div className="px-2 sm:px-4 pt-5 pb-">
         <div className="flex gap-1 items-start">
-          <div className="flex-shrink-0">
-            <img
-              className="mx-auto sm:h-14 sm:w-14 h-12 w-12 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-              alt=""
-            />
+          <div className="avatar">
+            <div className="w-12 rounded-full">
+              <img src={avatar} />
+            </div>
           </div>
           <div className="flex flex-col w-full space-y-2 pl-3">
             <div className="">
@@ -53,8 +101,6 @@ const CreatePost = () => {
               placeholder="What's on your mind?"
               rows="2"
               className="w-full placeholder:text-sm dark:text-zinc-200 resize-none max-h-40 focus:outline-none focus:border-none focus:ring-0 bg-transparent border-none"
-              // onFocus={onFocus}
-              // onBlur={onBlur}
               value={textValue}
               onChange={(e) => setTextValue(e.target.value)}
             ></textarea>
@@ -65,12 +111,7 @@ const CreatePost = () => {
             <div className="sm:p-2">
               <div className="relative h-72 w-full sm:rounded-lg overflow-hidden border border-gray-300 dark:border-zinc-600">
                 <span>
-                  <img
-                    alt="uploaded-image"
-                    src={imagePath}
-                    // decoding="async"
-                    // data-nimg="fill"
-                  />
+                  <img alt="uploaded-image" src={imagePath} />
                 </span>
               </div>
             </div>
@@ -125,13 +166,23 @@ const CreatePost = () => {
           />
         </label>
         {/* post button */}
-        <button className="py-2.5 text-sm font-medium flex gap-2 items-center justify-center hover:bg-gray-100 dark:hover:bg-zinc-800">
+        <button
+          onClick={handlePost}
+          className={`py-2.5 text-sm font-medium flex gap-2 items-center justify-center hover:bg-gray-100 ${
+            (loading || isLoading) && "bg-gray-100 cursor-wait"
+          } ${disableButton && "bg-gray-100"}`}
+          disabled={isLoading || disableButton}
+        >
           <svg
             stroke="currentColor"
             fill="currentColor"
             strokeWidth="0"
             viewBox="0 0 24 24"
-            className="text-red-500 w-7 h-7"
+            className={`w-7 h-7 ${
+              loading || isLoading || disableButton
+                ? "text-red-200"
+                : "text-red-500"
+            }`}
             height="1em"
             width="1em"
             xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +190,13 @@ const CreatePost = () => {
             <path d="M16 2H8C4.691 2 2 4.691 2 8v13a1 1 0 0 0 1 1h13c3.309 0 6-2.691 6-6V8c0-3.309-2.691-6-6-6zm4 14c0 2.206-1.794 4-4 4H4V8c0-2.206 1.794-4 4-4h8c2.206 0 4 1.794 4 4v8z"></path>
             <path d="M7 14.987v1.999h1.999l5.529-5.522-1.998-1.998zm8.47-4.465-1.998-2L14.995 7l2 1.999z"></path>
           </svg>
-          <span className="hidden sm:block text-gray-600 dark:text-zinc-200">
+          <span
+            className={`hidden sm:block ${
+              loading || isLoading || disableButton
+                ? "text-gray-400"
+                : "text-gray-600"
+            }`}
+          >
             Post
           </span>
         </button>

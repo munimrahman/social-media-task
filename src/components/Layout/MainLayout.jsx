@@ -11,15 +11,11 @@ const MainLayout = () => {
       <li>
         <Link to={"/media"}>Media</Link>
       </li>
-
       <li>
         <Link to={"/messages"}>Messages</Link>
       </li>
       <li>
         <Link to={"/about"}>About</Link>
-      </li>
-      <li>
-        <Link to={"/posts/1"}>Post Details</Link>
       </li>
     </>
   );

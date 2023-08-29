@@ -2,13 +2,19 @@ import { useState } from "react";
 import postPhoto from "../../assets/post.jpg";
 import Comment from "./Comment";
 import CommentBox from "./CommentBox";
-import { useGetSinglePostQuery } from "../../features/post/postApi";
+import {
+  useGetSinglePostQuery,
+  useLoveReactMutation,
+} from "../../features/post/postApi";
 import { useParams } from "react-router-dom";
 import avatar from "../../assets/avatar.png";
 import moment from "moment";
 
 const PostDetail = () => {
   const { id } = useParams();
+  const [loveReact] = useLoveReactMutation();
+  const [isFocused, setIsFocused] = useState(false);
+  const [isLoved, setIsLoved] = useState(false);
   const {
     data: {
       post: {
@@ -21,7 +27,14 @@ const PostDetail = () => {
       } = {},
     } = {},
   } = useGetSinglePostQuery(id);
-  const [isFocused, setIsFocused] = useState(false);
+
+  const handleLoveReact = () => {
+    const data = {};
+    setIsLoved(!isLoved);
+    if (!isLoved) data.loves = 1;
+    else data.loves = -1;
+    loveReact({ data, postId: id });
+  };
 
   return (
     <div className="bg-white mb-6 p-5 rounded-lg">
@@ -57,7 +70,6 @@ const PostDetail = () => {
           </div>
         </div>
         <div className="rounded-full hover:bg-gray-100 hover:cursor-pointer p-2">
-          {/* options */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -74,6 +86,7 @@ const PostDetail = () => {
           </svg>
         </div>
       </div>
+      {/* content */}
       <p className="mt-3 text-gray-700">{content}</p>
       {photoUrl && (
         <figure className="my-4 flex justify-center">
@@ -88,13 +101,13 @@ const PostDetail = () => {
       <div className="flex justify-between mt-3">
         {/* like button */}
         <div className="flex items-center justify-center gap-1">
-          <div>
+          <button onClick={handleLoveReact}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
+              fill={isLoved ? "red" : "none"}
               viewBox="0 0 24 24"
               strokeWidth="1.5"
-              stroke="gray"
+              stroke={isLoved ? "red" : "gray"}
               className="w-5 h-5 hover:cursor-pointer"
             >
               <path
@@ -103,7 +116,7 @@ const PostDetail = () => {
                 d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
               />
             </svg>
-          </div>
+          </button>
           <p className="text-sm text-gray-500">
             {loves} <span className="hidden md:inline">people like this</span>
           </p>
