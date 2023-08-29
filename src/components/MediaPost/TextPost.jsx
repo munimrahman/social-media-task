@@ -8,7 +8,7 @@ const TextPost = () => {
         <div className="flex items-center gap-2">
           <div className="avatar">
             <div className="w-10 rounded-full">
-              <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+              <img src="https://wallpapers.com/images/hd/cool-profile-picture-87h46gcobjl5e4xu.jpg" />
             </div>
           </div>
           <div>

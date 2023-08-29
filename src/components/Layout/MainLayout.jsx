@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import Footer from "../Footer/Footer";
+import logo from "../../assets/logo.png";
 
 const MainLayout = () => {
   const menuItems = (
@@ -25,7 +26,7 @@ const MainLayout = () => {
 
   return (
     <main className="bg-[#F4F4F4]">
-      <div className="navbar bg-base-100 border-b shadow-sm">
+      <div className="navbar bg-base-100 border-b shadow-sm px-0 md:px-6">
         <div className="navbar-start">
           <div className="dropdown">
             <label tabIndex={0} className="btn btn-ghost lg:hidden">
@@ -51,13 +52,28 @@ const MainLayout = () => {
               {menuItems}
             </ul>
           </div>
-          <p>Social Media</p>
+          <div className="w-3/5">
+            <Link to={"/"}>
+              <img src={logo} className="" alt="" />
+            </Link>
+          </div>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">{menuItems}</ul>
         </div>
         <div className="navbar-end">
-          <div className="dropdown dropdown-end">
+          <>
+            <Link className="mr-3 sm:hidden" to="/log-in">
+              <button className="btn btn-outline btn-xs">Get Started</button>
+            </Link>
+            <Link className="mr-3 hidden sm:block" to="/sign-up">
+              <button className="btn btn-outline">Register</button>
+            </Link>
+            <Link className="hidden sm:block" to="/log-in">
+              <button className="btn btn-neutral">LogIn</button>
+            </Link>
+          </>
+          {/* <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
               <div className="w-10 rounded-full">
                 <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
@@ -80,7 +96,7 @@ const MainLayout = () => {
                 <a>Logout</a>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="max-w-[1280px] mx-auto min-h-screen">

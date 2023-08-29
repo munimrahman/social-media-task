@@ -1,9 +1,11 @@
-import PhotoPost from "../../components/MediaPost/PhotoPost";
-import TextPost from "../../components/MediaPost/TextPost";
+import Post from "../../components/MediaPost/Post";
+import { useGetPostsQuery } from "../../features/post/postApi";
 import LeftSide from "../Home/LeftSide";
 import RightSide from "../Home/RightSide";
 
 const Media = () => {
+  const { data: { posts = [] } = {} } = useGetPostsQuery();
+
   return (
     <div className="mt-5">
       <div className="md:grid md:grid-cols-12 md:gap-5">
@@ -11,9 +13,9 @@ const Media = () => {
           <LeftSide />
         </div>
         <div className="md:col-span-6">
-          <TextPost />
-          <PhotoPost />
-          <PhotoPost />
+          {posts.map((post) => (
+            <Post post={post} key={post._id} />
+          ))}
         </div>
         <div className="md:col-span-3">
           <RightSide />

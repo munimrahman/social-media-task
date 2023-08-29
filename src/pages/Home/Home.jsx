@@ -1,5 +1,5 @@
 import CreatePost from "../../components/MediaPost/CreatePost";
-import PhotoPost from "../../components/MediaPost/PhotoPost";
+import Post from "../../components/MediaPost/Post";
 import TextPost from "../../components/MediaPost/TextPost";
 import LeftSide from "./LeftSide";
 import RightSide from "./RightSide";
@@ -14,8 +14,8 @@ const Home = () => {
         <div className="md:col-span-6">
           <CreatePost />
           <TextPost />
-          <PhotoPost />
-          <PhotoPost />
+          <Post />
+          <Post />
         </div>
         <div className="md:col-span-3">
           <RightSide />

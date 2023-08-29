@@ -1,8 +1,22 @@
+/* eslint-disable react/prop-types */
 import postPhoto from "../../assets/post.jpg";
+import avatar from "../../assets/avatar.png";
+import moment from "moment";
+import { Link } from "react-router-dom";
 
-const Post = () => {
+const Post = ({ post }) => {
+  const {
+    _id,
+    content,
+    photoUrl,
+    createdAt,
+    loves,
+    comments = [],
+    author: { name, profilePhoto } = {},
+  } = post || {};
+
   return (
-    <div className="bg-white my-6 p-5 rounded-lg">
+    <div className="bg-white mb-6 p-5 rounded-lg">
       {/* post header */}
 
       <div className="flex justify-between items-center">
@@ -10,12 +24,28 @@ const Post = () => {
         <div className="flex items-center gap-2">
           <div className="avatar">
             <div className="w-10 rounded-full">
-              <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+              <img src={profilePhoto || avatar} />
             </div>
           </div>
           <div>
-            <p className="text-base font-bold">Arya Stark</p>
-            <p className="text-xs text-gray-500">July 26 2018, 01:03pm</p>
+            <p className="text-base font-bold">{name}</p>
+            <p className="text-xs text-gray-500 flex gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              {moment(createdAt).format("lll")}
+            </p>
           </div>
         </div>
         <div className="rounded-full hover:bg-gray-100 hover:cursor-pointer p-2">
@@ -36,14 +66,16 @@ const Post = () => {
           </svg>
         </div>
       </div>
-      <p className="mt-3 text-gray-700">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ad at pariatur
-        laboriosam sint alias nihil aperiam earum voluptatibus vero error? Lorem
-        ipsum dolor sit amet, consectetur.
-      </p>
-      <figure className="my-4 flex justify-center">
-        <img src={postPhoto} className="rounded-lg w-full max-h-80" alt="" />
-      </figure>
+      <p className="mt-3 text-gray-700">{content}</p>
+      {photoUrl && (
+        <figure className="my-4 flex justify-center">
+          <img
+            src={photoUrl || postPhoto}
+            className="rounded-lg w-full max-h-80"
+            alt=""
+          />
+        </figure>
+      )}
       {/* post bottom */}
       <div className="flex justify-between mt-3">
         {/* like button */}
@@ -65,7 +97,7 @@ const Post = () => {
             </svg>
           </div>
           <p className="text-sm text-gray-500">
-            12 <span className="hidden md:inline">people like this</span>
+            {loves} <span className="hidden md:inline">people like this</span>
           </p>
         </div>
         {/* comment */}
@@ -86,10 +118,15 @@ const Post = () => {
               />
             </svg>
             <p className="text-sm text-gray-500">
-              5 <span className="hidden md:inline">Comments</span>
+              {comments.length}{" "}
+              <span className="hidden md:inline">Comments</span>
             </p>
           </div>
-          <button className="flex items-center justify-center">
+          {/* details button */}
+          <Link
+            to={`/posts/${_id}`}
+            className="flex items-center justify-center"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -104,9 +141,8 @@ const Post = () => {
                 d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
               />
             </svg>
-
             <p className="text-sm text-gray-500">Details</p>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

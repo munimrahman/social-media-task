@@ -6,6 +6,8 @@ import Media from "./pages/Media/Media";
 import Message from "./pages/Message/Message";
 import MainLayout from "./components/Layout/MainLayout";
 import PostDetails from "./pages/PostDetails/PostDetails";
+import LogIn from "./pages/LogIn/LogIn";
+import SignUp from "./pages/SignUp/SignUp";
 
 function App() {
   const router = createBrowserRouter([
@@ -32,6 +34,14 @@ function App() {
         {
           path: "/posts/:id",
           element: <PostDetails />,
+        },
+        {
+          path: "/log-in",
+          element: <LogIn />,
+        },
+        {
+          path: "/sign-up",
+          element: <SignUp />,
         },
       ],
     },

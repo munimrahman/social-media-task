@@ -1,6 +1,6 @@
 import LeftSide from "../Home/LeftSide";
 import RightSide from "../Home/RightSide";
-import Post from "./Post";
+import PostDetail from "./PostDetail";
 
 const PostDetails = () => {
   return (
@@ -10,7 +10,7 @@ const PostDetails = () => {
           <LeftSide />
         </div>
         <div className="md:col-span-6">
-          <Post />
+          <PostDetail />
         </div>
         <div className="md:col-span-3">
           <RightSide />

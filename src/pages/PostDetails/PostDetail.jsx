@@ -1,8 +1,30 @@
+import { useState } from "react";
 import postPhoto from "../../assets/post.jpg";
+import Comment from "./Comment";
+import CommentBox from "./CommentBox";
+import { useGetSinglePostQuery } from "../../features/post/postApi";
+import { useParams } from "react-router-dom";
+import avatar from "../../assets/avatar.png";
+import moment from "moment";
 
-const PhotoPost = () => {
+const PostDetail = () => {
+  const { id } = useParams();
+  const {
+    data: {
+      post: {
+        content,
+        photoUrl,
+        loves,
+        comments = [],
+        createdAt,
+        author: { name, profilePhoto } = {},
+      } = {},
+    } = {},
+  } = useGetSinglePostQuery(id);
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
-    <div className="bg-white my-6 p-5 rounded-lg">
+    <div className="bg-white mb-6 p-5 rounded-lg">
       {/* post header */}
 
       <div className="flex justify-between items-center">
@@ -10,12 +32,28 @@ const PhotoPost = () => {
         <div className="flex items-center gap-2">
           <div className="avatar">
             <div className="w-10 rounded-full">
-              <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+              <img src={profilePhoto || avatar} />
             </div>
           </div>
           <div>
-            <p className="text-base font-bold">Arya Stark</p>
-            <p className="text-xs text-gray-500">July 26 2018, 01:03pm</p>
+            <p className="text-base font-bold">{name}</p>
+            <p className="text-xs text-gray-500 flex gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              {moment(createdAt).format("lll")}
+            </p>
           </div>
         </div>
         <div className="rounded-full hover:bg-gray-100 hover:cursor-pointer p-2">
@@ -36,14 +74,16 @@ const PhotoPost = () => {
           </svg>
         </div>
       </div>
-      <p className="mt-3 text-gray-700">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ad at pariatur
-        laboriosam sint alias nihil aperiam earum voluptatibus vero error? Lorem
-        ipsum dolor sit amet, consectetur.
-      </p>
-      <figure className="my-4 flex justify-center">
-        <img src={postPhoto} className="rounded-lg w-full max-h-80" alt="" />
-      </figure>
+      <p className="mt-3 text-gray-700">{content}</p>
+      {photoUrl && (
+        <figure className="my-4 flex justify-center">
+          <img
+            src={photoUrl || postPhoto}
+            className="rounded-lg w-full max-h-80"
+            alt=""
+          />
+        </figure>
+      )}
       {/* post bottom */}
       <div className="flex justify-between mt-3">
         {/* like button */}
@@ -65,7 +105,7 @@ const PhotoPost = () => {
             </svg>
           </div>
           <p className="text-sm text-gray-500">
-            12 <span className="hidden md:inline">people like this</span>
+            {loves} <span className="hidden md:inline">people like this</span>
           </p>
         </div>
         {/* comment */}
@@ -85,32 +125,26 @@ const PhotoPost = () => {
                 d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"
               />
             </svg>
-            <p className="text-sm text-gray-500">
-              5 <span className="hidden md:inline">Comments</span>
+            <p
+              onClick={() => setIsFocused(true)}
+              className="text-sm text-gray-500 hover:underline hover:cursor-pointer"
+            >
+              {comments.length}{" "}
+              <span className="hidden md:inline">Comments</span>
             </p>
           </div>
-          <button className="flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-              />
-            </svg>
-
-            <p className="text-sm text-gray-500">Details</p>
-          </button>
         </div>
+      </div>
+      <h3 className="mt-3 text-gray-900">Comments</h3>
+      <div className="divider my-1" />
+      <div>
+        {comments.map((comment) => (
+          <Comment key={comment._id} comment={comment} />
+        ))}
+        <CommentBox isFocused={isFocused} postId={id} />
       </div>
     </div>
   );
 };
 
-export default PhotoPost;
+export default PostDetail;
