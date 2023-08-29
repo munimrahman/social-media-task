@@ -2,18 +2,19 @@ import { useState } from "react";
 import Post from "../../components/MediaPost/Post";
 import EditModal from "./EditModal";
 import { useGetPostsQuery } from "../../features/post/postApi";
+import { useGetUserByEmailQuery } from "../../features/user/userApi";
+import avatar from "../../assets/avatar.png";
 
 const About = () => {
   const [modalCheck, setModalCheck] = useState(false);
-  const id = 5;
-  const email = "semon@gmail.com";
-
+  const emailC = "tamim@gmail.com";
   const { data: { posts = [] } = {} } = useGetPostsQuery();
-
-  const myPosts = posts.filter((post) => {
-    console.log(post.authorEmail);
-    return post.authorEmail === email;
-  });
+  const {
+    data: {
+      user: { _id, name, profilePhoto, email, address, university, about } = {},
+    } = {},
+  } = useGetUserByEmailQuery(emailC);
+  const myPosts = posts.filter((post) => post.authorEmail === emailC);
 
   return (
     <div className="mt-5 max-w-[1180px] mx-auto">
@@ -21,28 +22,22 @@ const About = () => {
         {/* info section */}
         <div className="md:col-span-4 bg-white rounded-lg px-5 pt-8 pb-5 h-min">
           <figure className="flex justify-center">
-            <img
-              src="https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg"
-              alt=""
-              className="w-36"
-            />
+            <img src={profilePhoto || avatar} alt="" className="w-36" />
           </figure>
-          <h2 className="text-center my-3 text-xl font-bold">Munim Rahman</h2>
+          <h2 className="text-center my-3 text-xl font-bold">{name}</h2>
           <h3 className="">About</h3>
-          <p className="text-[#999999] text-sm text-justify">
-            Update Your Cover Letter
-          </p>
+          <p className="text-[#999999] text-sm text-justify">{about}</p>
           <div className="my-3">
             <p>Email: </p>
-            <p className="text-[#999999] text-sm">Update Your Birth Date</p>
+            <p className="text-[#999999] text-sm">{email}</p>
           </div>
           <div className="mb-3">
             <p>Address: </p>
-            <p className="text-[#999999] text-sm">Update Your Birth Date</p>
+            <p className="text-[#999999] text-sm">{address}</p>
           </div>
           <div className="mb-3">
             <p>University: </p>
-            <p className="text-[#999999] text-sm">Update Your Birth Date</p>
+            <p className="text-[#999999] text-sm">{university}</p>
           </div>
           <div className="text-center">
             <button
@@ -63,7 +58,11 @@ const About = () => {
           ))}
         </div>
       </div>
-      <EditModal id={id} isChecked={modalCheck} setModalCheck={setModalCheck} />
+      <EditModal
+        id={_id}
+        isChecked={modalCheck}
+        setModalCheck={setModalCheck}
+      />
     </div>
   );
 };

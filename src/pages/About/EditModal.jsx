@@ -1,6 +1,10 @@
 /* eslint-disable react/prop-types */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  useEditUserMutation,
+  useGetUserQuery,
+} from "../../features/user/userApi";
 
 const initialState = {
   name: "",
@@ -13,7 +17,21 @@ const initialState = {
 
 function EditModal({ id, isChecked, setModalCheck }) {
   const [userData, setUserData] = useState(initialState);
-  console.log(id);
+  const { data: { user } = {} } = useGetUserQuery(id);
+  const [editUser] = useEditUserMutation();
+
+  useEffect(() => {
+    if (user?.name) setUserData((pre) => ({ ...pre, name: user.name }));
+    if (user?.email) setUserData((pre) => ({ ...pre, email: user.email }));
+    if (user?.address)
+      setUserData((pre) => ({ ...pre, address: user.address }));
+    if (user?.about) setUserData((pre) => ({ ...pre, about: user.about }));
+    if (user?.profilePhoto)
+      setUserData((pre) => ({ ...pre, profilePhoto: user.profilePhoto }));
+    if (user?.university)
+      setUserData((pre) => ({ ...pre, university: user.university }));
+  }, [user]);
+
   const handleChange = (e) => {
     const data = { ...userData };
     data[e.target.name] = e.target.value;
@@ -22,7 +40,7 @@ function EditModal({ id, isChecked, setModalCheck }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(userData);
+    editUser({ data: userData, id });
     setModalCheck(!isChecked);
   };
 
@@ -63,6 +81,7 @@ function EditModal({ id, isChecked, setModalCheck }) {
                   className="input input-sm input-bordered w-full max-w-xs mt-1 focus:outline-none"
                   value={userData.email}
                   onChange={handleChange}
+                  disabled
                 />
               </div>
             </div>
