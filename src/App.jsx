@@ -8,8 +8,13 @@ import MainLayout from "./components/Layout/MainLayout";
 import PostDetails from "./pages/PostDetails/PostDetails";
 import LogIn from "./pages/LogIn/LogIn";
 import SignUp from "./pages/SignUp/SignUp";
+import useAuthCheck from "./hooks/useAuthCheck";
+import PrivateRoute from "./Routes/PrivateRoute/PrivateRoute";
+import PublicRoute from "./Routes/PublicRoute/PublicRoute";
 
 function App() {
+  const authCheck = useAuthCheck();
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -33,21 +38,34 @@ function App() {
         },
         {
           path: "/posts/:id",
-          element: <PostDetails />,
+          element: (
+            <PrivateRoute>
+              <PostDetails />
+            </PrivateRoute>
+          ),
         },
         {
           path: "/log-in",
-          element: <LogIn />,
+          element: (
+            <PublicRoute>
+              <LogIn />
+            </PublicRoute>
+          ),
         },
         {
           path: "/sign-up",
-          element: <SignUp />,
+          element: (
+            <PublicRoute>
+              {" "}
+              <SignUp />
+            </PublicRoute>
+          ),
         },
       ],
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return authCheck && <RouterProvider router={router} />;
 }
 
 export default App;

@@ -1,8 +1,16 @@
 import { Link, Outlet } from "react-router-dom";
 import Footer from "../Footer/Footer";
 import logo from "../../assets/logo.png";
+import useAuth from "../../hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
+import { userLoggedOut } from "../../features/auth/authSlice";
+import avatar from "../../assets/avatar.png";
 
 const MainLayout = () => {
+  const isLoggedIn = useAuth();
+  const dispatch = useDispatch();
+  const { user: { profilePhoto } = {} } = useSelector((state) => state.auth);
+
   const menuItems = (
     <>
       <li>
@@ -11,9 +19,9 @@ const MainLayout = () => {
       <li>
         <Link to={"/media"}>Media</Link>
       </li>
-      <li>
+      {/* <li>
         <Link to={"/messages"}>Messages</Link>
-      </li>
+      </li> */}
       <li>
         <Link to={"/about"}>About</Link>
       </li>
@@ -58,41 +66,44 @@ const MainLayout = () => {
           <ul className="menu menu-horizontal px-1">{menuItems}</ul>
         </div>
         <div className="navbar-end">
-          <>
-            <Link className="mr-3 sm:hidden" to="/log-in">
-              <button className="btn btn-outline btn-xs">Get Started</button>
-            </Link>
-            <Link className="mr-3 hidden sm:block" to="/sign-up">
-              <button className="btn btn-outline">Register</button>
-            </Link>
-            <Link className="hidden sm:block" to="/log-in">
-              <button className="btn btn-neutral">LogIn</button>
-            </Link>
-          </>
-          {/* <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full">
-                <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-              </div>
-            </label>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              <li>
-                <a className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </a>
-              </li>
-              <li>
-                <a>Settings</a>
-              </li>
-              <li>
-                <a>Logout</a>
-              </li>
-            </ul>
-          </div> */}
+          {!isLoggedIn && (
+            <>
+              <Link className="mr-3 sm:hidden" to="/log-in">
+                <button className="btn btn-outline btn-xs">Get Started</button>
+              </Link>
+              <Link className="mr-3 hidden sm:block" to="/sign-up">
+                <button className="btn btn-outline">Register</button>
+              </Link>
+              <Link className="hidden sm:block" to="/log-in">
+                <button className="btn btn-neutral">LogIn</button>
+              </Link>
+            </>
+          )}
+          {isLoggedIn && (
+            <div className="dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="btn btn-ghost btn-circle hover:outline-none avatar"
+              >
+                <div className="w-10 rounded-full">
+                  <img src={profilePhoto || avatar} />
+                </div>
+              </label>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li>
+                  <Link to={"/about"} className="justify-between">
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <span onClick={() => dispatch(userLoggedOut())}>Logout</span>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
       <div className="max-w-[1280px] mx-auto min-h-screen">

@@ -1,17 +1,32 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import { useLogInMutation } from "../../features/auth/authApi";
 
 function LogIn() {
-  //   const navigate = useNavigate();
-  //   const location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  //   const from = location.state?.from?.pathname || "/";
-
+  const [errorText, setErrorText] = useState("");
+  const from = location.state?.from?.pathname || "/";
+  const [logIn, { data, error }] = useLogInMutation();
+  console.log(data);
   const handleLogIn = (e) => {
     e.preventDefault();
-    console.log(email, password);
+    logIn({ email, password });
+  };
+
+  useEffect(() => {
+    if (error) {
+      setErrorText("Invalid Email or Password");
+    } else {
+      setErrorText("");
+    }
+  }, [error]);
+
+  const toSignUp = () => {
+    navigate("/sign-up", { state: { from } });
   };
 
   return (
@@ -74,7 +89,7 @@ function LogIn() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {/* <p className="text-red-500 text-sm">{errorText && errorText}</p> */}
+            <p className="text-red-500 text-sm">{errorText && errorText}</p>
           </div>
           <div>
             <button
@@ -88,12 +103,12 @@ function LogIn() {
 
         <p className="mt-2 text-center text-sm text-gray-500">
           Not a member?{" "}
-          <Link
-            to={"/sign-up"}
+          <span
+            onClick={toSignUp}
             className="font-semibold leading-6 text-primary hover:text-blue-500 hover:cursor-pointer"
           >
             Sign Up Here
-          </Link>
+          </span>
         </p>
       </div>
     </div>

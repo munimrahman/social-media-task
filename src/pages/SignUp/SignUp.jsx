@@ -1,13 +1,15 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import { useRegisterMutation } from "../../features/auth/authApi";
 
 function SignUp() {
-  //   const navigate = useNavigate();
-  //   const location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [register, { error, isError, isSuccess }] = useRegisterMutation();
 
   const [errorObj, setErrorObj] = useState({
     name: "",
@@ -15,14 +17,47 @@ function SignUp() {
     password: "",
   });
 
-  console.log(setErrorObj);
-  //   const from = location?.state?.from || "/";
-
+  const from = location?.state?.from || "/";
+  if (!isError && isSuccess) {
+    console.log("in login", from);
+    navigate(from, { replace: true });
+  }
   const handleSignUp = (e) => {
     e.preventDefault();
     const userObj = { name, email, password };
-    console.log(userObj);
+    register(userObj);
   };
+  console.log(error);
+  useEffect(() => {
+    const { data: { message, errors = {} } = {} } = error || {};
+    if (errors.name) {
+      setErrorObj((pre) => ({ ...pre, name: errors?.name?.msg }));
+    } else {
+      setErrorObj((pre) => ({ ...pre, name: "" }));
+    }
+    if (errors.password) {
+      setErrorObj((pre) => ({ ...pre, password: errors?.password?.msg }));
+    } else {
+      setErrorObj((pre) => ({ ...pre, password: "" }));
+    }
+    if (message?.includes("email_1 dup key")) {
+      setErrorObj((pre) => ({
+        ...pre,
+        email: "Email Already Used, Try With Another Email",
+      }));
+    } else {
+      setErrorObj((pre) => ({ ...pre, email: "" }));
+    }
+
+    if (message?.includes("Password must be at least 4 characters")) {
+      setErrorObj((pre) => ({
+        ...pre,
+        password: "Password must be at least 4 characters",
+      }));
+    } else {
+      setErrorObj((pre) => ({ ...pre, email: "" }));
+    }
+  }, [error]);
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center pt-10 px-6 lg:px-8">
