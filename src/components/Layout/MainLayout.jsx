@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import Footer from "../Footer/Footer";
 import logo from "../../assets/logo.png";
 import useAuth from "../../hooks/useAuth";
@@ -11,19 +11,42 @@ const MainLayout = () => {
   const dispatch = useDispatch();
   const { user: { profilePhoto } = {} } = useSelector((state) => state.auth);
 
+  const activeClassName = "text-sm bg-gray-200";
+  const inActiveClassName = "text-sm";
   const menuItems = (
     <>
       <li>
-        <Link to={"/"}>Home</Link>
+        <NavLink
+          to={"/"}
+          className={({ isActive }) =>
+            isActive ? activeClassName : inActiveClassName
+          }
+        >
+          Home
+        </NavLink>
       </li>
       <li>
-        <Link to={"/media"}>Media</Link>
+        <NavLink
+          to={"/media"}
+          className={({ isActive }) =>
+            isActive ? activeClassName : inActiveClassName
+          }
+        >
+          Media
+        </NavLink>
       </li>
       {/* <li>
         <Link to={"/messages"}>Messages</Link>
       </li> */}
       <li>
-        <Link to={"/about"}>About</Link>
+        <NavLink
+          to={"/about"}
+          className={({ isActive }) =>
+            isActive ? activeClassName : inActiveClassName
+          }
+        >
+          About
+        </NavLink>
       </li>
     </>
   );
@@ -56,7 +79,7 @@ const MainLayout = () => {
               {menuItems}
             </ul>
           </div>
-          <div className="w-3/5">
+          <div className="w-5/12">
             <Link to={"/"}>
               <img src={logo} className="" alt="" />
             </Link>

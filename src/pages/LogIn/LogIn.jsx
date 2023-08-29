@@ -10,7 +10,7 @@ function LogIn() {
   const [password, setPassword] = useState("");
   const [errorText, setErrorText] = useState("");
   const from = location.state?.from?.pathname || "/";
-  const [logIn, { data, error }] = useLogInMutation();
+  const [logIn, { data, error, isLoading }] = useLogInMutation();
   console.log(data);
   const handleLogIn = (e) => {
     e.preventDefault();
@@ -41,12 +41,19 @@ function LogIn() {
       <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleLogIn} className="space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Email Address
-            </label>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Email Address
+              </label>
+              <div className="text-sm">
+                <span href="#" className="text-gray-500">
+                  Demo Email: jon@gmail.com
+                </span>
+              </div>
+            </div>
             <div className="mt-2">
               <input
                 type="email"
@@ -70,12 +77,9 @@ function LogIn() {
                 Password
               </label>
               <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-semibold text-primary hover:text-blue-500"
-                >
-                  Forgot password?
-                </a>
+                <span href="#" className="text-gray-500">
+                  Demo Password: 123456
+                </span>
               </div>
             </div>
             <div className="mt-2">
@@ -94,9 +98,12 @@ function LogIn() {
           <div>
             <button
               type="submit"
-              className={`flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+              className={`flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+                isLoading && "cursor-wait"
+              }`}
+              disabled={isLoading}
             >
-              Log In
+              {!isLoading ? "Log In" : "Loading..."}
             </button>
           </div>
         </form>

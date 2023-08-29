@@ -26,7 +26,11 @@ function App() {
         },
         {
           path: "/about",
-          element: <About />,
+          element: (
+            <PrivateRoute>
+              <About />
+            </PrivateRoute>
+          ),
         },
         {
           path: "/media",

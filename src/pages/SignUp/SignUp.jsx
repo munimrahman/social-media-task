@@ -9,7 +9,8 @@ function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [register, { error, isError, isSuccess }] = useRegisterMutation();
+  const [register, { error, isError, isSuccess, isLoading }] =
+    useRegisterMutation();
 
   const [errorObj, setErrorObj] = useState({
     name: "",
@@ -55,10 +56,10 @@ function SignUp() {
         password: "Password must be at least 4 characters",
       }));
     } else {
-      setErrorObj((pre) => ({ ...pre, email: "" }));
+      setErrorObj((pre) => ({ ...pre, password: "" }));
     }
   }, [error]);
-
+  console.log(errorObj);
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center pt-10 px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -145,9 +146,12 @@ function SignUp() {
           <div>
             <button
               type="submit"
-              className={`flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+              className={`flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+                isLoading && "cursor-wait"
+              }`}
+              disabled={isLoading}
             >
-              Sign Up
+              {!isLoading ? "Sign Up" : "Loading..."}
             </button>
           </div>
         </form>

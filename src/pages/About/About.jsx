@@ -5,6 +5,7 @@ import { useGetPostsQuery } from "../../features/post/postApi";
 import avatar from "../../assets/avatar.png";
 import { useSelector } from "react-redux";
 import { useGetUserQuery } from "../../features/user/userApi";
+import LoadingSpinner from "../../components/LoadingComponent/LoadingSpinner";
 
 const About = () => {
   const [modalCheck, setModalCheck] = useState(false);
@@ -13,10 +14,24 @@ const About = () => {
     data: {
       user: { name, email, profilePhoto, about, address, university } = {},
     } = {},
+    isLoading,
   } = useGetUserQuery(_id);
   const { data: { posts = [] } = {} } = useGetPostsQuery();
 
   const myPosts = posts.filter((post) => post.authorEmail === email);
+
+  let postData = null;
+  if (isLoading) {
+    postData = <LoadingSpinner />;
+  } else {
+    postData = (
+      <>
+        {myPosts.map((post) => (
+          <Post post={post} key={post._id} from={"home"} />
+        ))}
+      </>
+    );
+  }
 
   return (
     <div className="mt-5 max-w-[1180px] mx-auto">
@@ -26,7 +41,7 @@ const About = () => {
           <figure className="flex justify-center">
             <img src={profilePhoto || avatar} alt="" className="w-36" />
           </figure>
-          <h2 className="text-center my-3 text-xl font-bold">{name}</h2>
+          <h2 className="text-center my-3 text-xl font-bold">{name || ""}</h2>
           <h3 className="">About</h3>
           <p className="text-[#999999] text-sm text-justify">
             {about || "Update Your Bio"}
@@ -63,9 +78,7 @@ const About = () => {
           <h1 className="bg-white rounded-lg p-4 text-lg font-bold mb-6">
             My Posts
           </h1>
-          {myPosts.map((post) => (
-            <Post post={post} key={post._id} />
-          ))}
+          {postData}
         </div>
       </div>
       <EditModal

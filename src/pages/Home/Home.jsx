@@ -1,3 +1,4 @@
+import LoadingSpinner from "../../components/LoadingComponent/LoadingSpinner";
 import CreatePost from "../../components/MediaPost/CreatePost";
 import Post from "../../components/MediaPost/Post";
 import { useGetThreePostsQuery } from "../../features/post/postApi";
@@ -5,7 +6,20 @@ import LeftSide from "./LeftSide";
 import RightSide from "./RightSide";
 
 const Home = () => {
-  const { data: { posts = [] } = {} } = useGetThreePostsQuery();
+  const { data: { posts = [] } = {}, isLoading } = useGetThreePostsQuery();
+
+  let postData = null;
+  if (isLoading) {
+    postData = <LoadingSpinner />;
+  } else {
+    postData = (
+      <>
+        {posts.map((post) => (
+          <Post post={post} key={post._id} from={"home"} />
+        ))}
+      </>
+    );
+  }
   return (
     <div className="mt-5">
       <div className="md:grid md:grid-cols-12 md:gap-5">
@@ -17,9 +31,7 @@ const Home = () => {
           <h1 className="bg-white rounded-lg p-4 text-lg font-bold mb-5">
             Top Three Popular Posts
           </h1>
-          {posts.map((post) => (
-            <Post post={post} key={post._id} from={"home"} />
-          ))}
+          {postData}
         </div>
         <div className="md:col-span-3">
           <RightSide />
