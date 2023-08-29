@@ -1,10 +1,15 @@
+import { useEffect } from "react";
 import Post from "../../components/MediaPost/Post";
 import { useGetPostsQuery } from "../../features/post/postApi";
 import LeftSide from "../Home/LeftSide";
 import RightSide from "../Home/RightSide";
 
 const Media = () => {
-  const { data: { posts = [] } = {} } = useGetPostsQuery();
+  const { data: { posts = [] } = {}, refetch } = useGetPostsQuery();
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <div className="mt-5">

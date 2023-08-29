@@ -1,28 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useAddPostMutation } from "../../features/post/postApi";
 import avatar from "../../assets/avatar.png";
-
-const useAutoSizeTextArea = (textAreaRef, value) => {
-  useEffect(() => {
-    if (textAreaRef) {
-      // We need to reset the height momentarily to get the correct scrollHeight for the textarea
-      textAreaRef.style.height = "51px";
-      const scrollHeight = textAreaRef.scrollHeight;
-
-      // We then set the height directly, outside of the render loop
-      // Trying to set this with state or a ref will product an incorrect value.
-      textAreaRef.style.height = scrollHeight + "px";
-    }
-  }, [textAreaRef, value]);
-};
+import useAutoSizeTextArea from "../../hooks/useAutoSizeTextArea";
+import { useSelector } from "react-redux";
+import useAuth from "../../hooks/useAuth";
+import { Link, useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
-  const authorEmail = "tamim@gmail.com";
+  const { user: { _id, name, email, profilePhoto } = {} } = useSelector(
+    (state) => state.auth
+  );
+  const isLoggedIn = useAuth();
+  const navigate = useNavigate();
+  const authorEmail = email;
   const [textValue, setTextValue] = useState("");
   const [imagePath, setImagePath] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [addPost, { isLoading }] = useAddPostMutation();
+  const [addPost, { data, isLoading }] = useAddPostMutation();
   const textAreaRef = useRef(null);
   useAutoSizeTextArea(textAreaRef.current, textValue);
   const onImageChange = (event) => {
@@ -35,11 +30,10 @@ const CreatePost = () => {
   const removeImage = () => {
     setImagePath(null);
   };
-  if (loading || isLoading) {
-    console.log(loading, isLoading);
-  } else {
-    console.log(loading, isLoading);
+  if (data?.message === "success") {
+    navigate("/media");
   }
+
   const imageHostKey = "d813c7643bdd7e54cf105fb37f5f3f78";
   const handlePost = () => {
     if (imagePath) {
@@ -56,7 +50,7 @@ const CreatePost = () => {
           if (imgData.success) {
             const postData = {
               content: textValue,
-              author: "64ed13f5598c4854fe402780",
+              author: _id,
               authorEmail,
               loves: 0,
               photoUrl: imgData.data.url,
@@ -65,12 +59,13 @@ const CreatePost = () => {
             //   save info to database
             addPost(postData);
             setTextValue("");
+            setImagePath(null);
           }
         });
     } else {
       const postData = {
         content: textValue,
-        author: "64ed13f5598c4854fe402780",
+        author: _id,
         authorEmail,
         loves: 0,
       };
@@ -81,62 +76,10 @@ const CreatePost = () => {
   let disableButton = true;
   if (imagePath || textValue) disableButton = false;
 
-  return (
-    <div className="rounded-lg bg-white dark:bg-black sm:dark:border dark:border-zinc-600 overflow-hidden mb-6">
-      <div className="px-2 sm:px-4 pt-5 pb-">
-        <div className="flex gap-1 items-start">
-          <div className="avatar">
-            <div className="w-12 rounded-full">
-              <img src={avatar} />
-            </div>
-          </div>
-          <div className="flex flex-col w-full space-y-2 pl-3">
-            <div className="">
-              <h1 className="font-medium sm:text-lg leading-6">Jon Snow</h1>
-            </div>
-            <textarea
-              ref={textAreaRef}
-              name="post__content"
-              id="post__content"
-              placeholder="What's on your mind?"
-              rows="2"
-              className="w-full placeholder:text-sm dark:text-zinc-200 resize-none max-h-40 focus:outline-none focus:border-none focus:ring-0 bg-transparent border-none"
-              value={textValue}
-              onChange={(e) => setTextValue(e.target.value)}
-            ></textarea>
-          </div>
-        </div>
-        {imagePath && (
-          <div className="relative w-full">
-            <div className="sm:p-2">
-              <div className="relative h-72 w-full sm:rounded-lg overflow-hidden border border-gray-300 dark:border-zinc-600">
-                <span>
-                  <img alt="uploaded-image" src={imagePath} />
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={removeImage}
-              className="absolute top-3 right-1 mr-2.5"
-              type="button"
-            >
-              <svg
-                stroke="currentColor"
-                fill="currentColor"
-                strokeWidth="0"
-                viewBox="0 0 16 16"
-                className="h-5 w-5 box-content p-2 rounded-full bg-white border dark:border-zinc-600 dark:bg-zinc-700"
-                height="1em"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
-              </svg>
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="border m-2 rounded-lg overflow-hidden border-gray-200 bg-gray-50 grid divide-gray-200 grid-cols-2 divide-y-0 divide-x">
+  let postButton = null;
+  if (isLoggedIn) {
+    postButton = (
+      <>
         {/* upload photo */}
         <label className="py-2.5 text-sm font-medium flex gap-2 items-center justify-center hover:bg-gray-100 hover:cursor-pointer">
           <svg
@@ -200,6 +143,83 @@ const CreatePost = () => {
             Post
           </span>
         </button>
+      </>
+    );
+  } else if (!isLoggedIn) {
+    postButton = (
+      <div
+        onClick={handlePost}
+        className={`py-2.5 text-sm font-medium flex justify-center text-center hover:bg-gray-100 col-span-2`}
+      >
+        <p>
+          To Create Post Please{" "}
+          <Link
+            to={"/log-in"}
+            className="underline text-blue-500 hover:cursor-pointer"
+          >
+            Log In
+          </Link>
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-lg bg-white dark:bg-black sm:dark:border dark:border-zinc-600 overflow-hidden mb-6">
+      <div className="px-2 sm:px-4 pt-5 pb-">
+        <div className="flex gap-1 items-start">
+          <div className="avatar">
+            <div className="w-12 rounded-full">
+              <img src={profilePhoto || avatar} />
+            </div>
+          </div>
+          <div className="flex flex-col w-full space-y-2 pl-3">
+            <div className="">
+              <h1 className="font-medium sm:text-lg leading-6">{name}</h1>
+            </div>
+            <textarea
+              ref={textAreaRef}
+              name="post__content"
+              id="post__content"
+              placeholder="What's on your mind?"
+              rows="2"
+              className="w-full placeholder:text-sm dark:text-zinc-200 resize-none max-h-40 focus:outline-none focus:border-none focus:ring-0 bg-transparent border-none"
+              value={textValue}
+              onChange={(e) => setTextValue(e.target.value)}
+            ></textarea>
+          </div>
+        </div>
+        {imagePath && (
+          <div className="relative w-full">
+            <div className="sm:p-2">
+              <div className="relative h-72 w-full sm:rounded-lg overflow-hidden border border-gray-300 dark:border-zinc-600">
+                <span>
+                  <img alt="uploaded-image" src={imagePath} />
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={removeImage}
+              className="absolute top-3 right-1 mr-2.5"
+              type="button"
+            >
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 16 16"
+                className="h-5 w-5 box-content p-2 rounded-full bg-white border dark:border-zinc-600 dark:bg-zinc-700"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="border m-2 rounded-lg overflow-hidden border-gray-200 bg-gray-50 grid  divide-gray-200 grid-cols-2 divide-y-0 divide-x">
+        {postButton}
       </div>
     </div>
   );

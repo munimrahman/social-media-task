@@ -2,19 +2,21 @@ import { useState } from "react";
 import Post from "../../components/MediaPost/Post";
 import EditModal from "./EditModal";
 import { useGetPostsQuery } from "../../features/post/postApi";
-import { useGetUserByEmailQuery } from "../../features/user/userApi";
 import avatar from "../../assets/avatar.png";
+import { useSelector } from "react-redux";
+import { useGetUserQuery } from "../../features/user/userApi";
 
 const About = () => {
   const [modalCheck, setModalCheck] = useState(false);
-  const emailC = "tamim@gmail.com";
-  const { data: { posts = [] } = {} } = useGetPostsQuery();
+  const { user: { _id } = {} } = useSelector((state) => state.auth);
   const {
     data: {
-      user: { _id, name, profilePhoto, email, address, university, about } = {},
+      user: { name, email, profilePhoto, about, address, university } = {},
     } = {},
-  } = useGetUserByEmailQuery(emailC);
-  const myPosts = posts.filter((post) => post.authorEmail === emailC);
+  } = useGetUserQuery(_id);
+  const { data: { posts = [] } = {} } = useGetPostsQuery();
+
+  const myPosts = posts.filter((post) => post.authorEmail === email);
 
   return (
     <div className="mt-5 max-w-[1180px] mx-auto">
@@ -26,18 +28,26 @@ const About = () => {
           </figure>
           <h2 className="text-center my-3 text-xl font-bold">{name}</h2>
           <h3 className="">About</h3>
-          <p className="text-[#999999] text-sm text-justify">{about}</p>
+          <p className="text-[#999999] text-sm text-justify">
+            {about || "Update Your Bio"}
+          </p>
           <div className="my-3">
             <p>Email: </p>
-            <p className="text-[#999999] text-sm">{email}</p>
+            <p className="text-[#999999] text-sm">
+              {email || "Update Your Email"}
+            </p>
           </div>
           <div className="mb-3">
             <p>Address: </p>
-            <p className="text-[#999999] text-sm">{address}</p>
+            <p className="text-[#999999] text-sm">
+              {address || "Update Your Address"}
+            </p>
           </div>
           <div className="mb-3">
             <p>University: </p>
-            <p className="text-[#999999] text-sm">{university}</p>
+            <p className="text-[#999999] text-sm">
+              {university || "Update Your University"}
+            </p>
           </div>
           <div className="text-center">
             <button
