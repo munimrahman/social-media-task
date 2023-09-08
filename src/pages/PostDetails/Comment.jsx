@@ -6,7 +6,7 @@ const Comment = ({ comment }) => {
   const {
     comment: content,
     createdAt,
-    author: { name, profilePhoto } = {},
+    author: { name = "", profilePhoto = "" } = {},
   } = comment || {};
 
   return (
@@ -17,7 +17,7 @@ const Comment = ({ comment }) => {
         </div>
       </div>
       <div className="">
-        <h3 className="text-sm font-medium">{name}</h3>
+        <h3 className="text-sm font-medium">{name || "Jon Snow"}</h3>
         <p className="text-xs text-gray-500 flex gap-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"

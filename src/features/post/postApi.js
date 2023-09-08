@@ -45,11 +45,11 @@ export const blogsApi = apiSlice.injectEndpoints({
         { postId, data, cacheData },
         { queryFulfilled, dispatch }
       ) {
-        const patchResult = dispatch(
-          apiSlice.util.updateQueryData("getSinglePost", postId, (draft) => {
-            draft.post.comments.push(cacheData);
-          })
-        );
+        // const patchResult = dispatch(
+        //   apiSlice.util.updateQueryData("getSinglePost", postId, (draft) => {
+        //     draft.post.comments.push(cacheData);
+        //   })
+        // );
 
         try {
           const { data: res } = await queryFulfilled;
@@ -66,7 +66,7 @@ export const blogsApi = apiSlice.injectEndpoints({
             );
           }
         } catch (error) {
-          patchResult.undo();
+          // patchResult.undo();
         }
       },
     }),

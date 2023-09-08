@@ -3,14 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import avatar from "../../assets/avatar.png";
 import { useCreateCommentMutation } from "../../features/post/postApi";
+import { useSelector } from "react-redux";
 
 function CommentBox({ isFocused, postId }) {
+  const { user: { _id, name } = {} } = useSelector((state) => state.auth);
   const [createComment] = useCreateCommentMutation();
-  const id = "64ed13f5598c4854fe402780";
+
   const author = {
-    _id: id,
-    name: "Tamim Iqbal",
+    _id,
+    name,
   };
+
   const [text, setText] = useState("");
 
   const ref = useRef();
@@ -21,7 +24,7 @@ function CommentBox({ isFocused, postId }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const data = { author: id, comment: text };
+    const data = { author: _id, comment: text };
     createComment({ data, postId, cacheData: { author, data } });
     setText("");
   };

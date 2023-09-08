@@ -73,6 +73,7 @@ const CreatePost = () => {
       addPost(postData);
     }
   };
+
   let disableButton = true;
   if (imagePath || textValue) disableButton = false;
 
